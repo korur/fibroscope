@@ -5,3 +5,4 @@ GSE122960_RAW.tar
 .gitignore
 fibroscope.Rproj
 data/
+Analysis_1_cache/

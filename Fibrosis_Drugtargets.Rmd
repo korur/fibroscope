@@ -2,7 +2,9 @@
 title: "Drug targets in Fibrosis"
 author: "Serdar Korur"
 date: "10/12/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r import packages}

@@ -1,0 +1,134 @@
+---
+title: "Analysis_1"
+author: "Serdar Korur"
+date: "10/12/2019"
+output: html_document
+---
+
+We will explore the data from a recent [article](https://www.atsjournals.org/doi/pdf/10.1164/rccm.201712-2410OC) which explored lung cells from Pulmonary fibrosis patients by scRNAseq.
+
+
+* **Pulmonary fibrosis** is a progressive scarring of the lung tissue leading to death within 3-4 years.
+* **Current therapies does not increase the survival** 
+* Many Biotech companies are developing **novel drugs**
+
+
+---> [Download Single Cell RNA seq data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM3489196)
+
+```{bash, eval=FALSE}
+curl -O https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE122960&format=file 
+tar -xvf GSE122960_RAW.tar --directory data/
+```
+
+I renamed the files for easy typing. 
+
+### Reading multiple h5 files and Creating a Seurat Object for all of them:
+
+```{r Reading multiple h5 files, cache=TRUE}
+library(Seurat)
+# Create a Vector containing names of all of the files you want to read in the folder 
+vector_h5 <- c("Donor_01.h5",   "Donor_02.h5",   "Donor_03.h5", 
+               "Donor_04.h5",   "Donor_05.h5",   "Donor_06.h5", 
+               "Donor_07.h5",   "Donor_08.h5",   "Cryo_01.h5", 
+               "HP_01.h5",      "IPF_01.h5",     "IPF_02.h5", 
+               "IPF_03.h5",     "IPF_04.h5",     "Myo_01.h5",
+               "SSc_01.h5", "SSc_02.h5")
+
+path <- file.path("data/FILTERED", vector_h5)
+
+# Read all h5 files with Read10X_h5 function
+
+GSE122690 <- lapply(path, Read10X_h5)
+```
+
+```{r For labeling seurat objects}
+# Create Seurat OBject with labels
+
+# DONORS
+
+D01 <- CreateSeuratObject(counts = GSE122690[[1]], project = "Donor")
+D01$L1 <- "D01"
+D01$L2 <- "Don"
+
+D02 <- CreateSeuratObject(counts = GSE122690[[2]], project = "Donor")
+D02$L1 <- "D02"
+D02$L2 <- "Don"
+
+D03 <- CreateSeuratObject(counts = GSE122690[[3]], project = "Donor")
+D03$L1 <- "D03"
+D03$L2 <- "Don"
+
+D04 <- CreateSeuratObject(counts = GSE122690[[4]], project = "Donor")
+D04$L1 <- "D04"
+D04$L2 <- "Don"
+
+D05 <- CreateSeuratObject(counts = GSE122690[[5]], project = "Donor")
+D05$L1 <- "D05"
+D05$L2 <- "Don"
+
+D06 <- CreateSeuratObject(counts = GSE122690[[6]], project = "Donor")
+D06$L1 <- "D06"
+D06$L2 <- "Don"
+
+D07 <- CreateSeuratObject(counts = GSE122690[[7]], project = "Donor")
+D07$L1 <- "D07"
+D07$L2 <- "Don"
+
+D08 <- CreateSeuratObject(counts = GSE122690[[8]], project = "Donor")
+D08$L1 <- "D08"
+D08$L2 <- "Don"
+
+
+# Patients
+
+Cry01 <- CreateSeuratObject(counts = GSE122690[[9]], project = "PF")
+Cry01$L1 <- "Cry01"
+Cry01$L2 <- "Pat"
+
+HP01 <- CreateSeuratObject(counts = GSE122690[[10]], project = "PF")
+HP01$L1 <- "HP01"
+HP01$L2 <- "Pat"
+
+# IPF
+
+IPF01 <- CreateSeuratObject(counts = GSE122690[[11]], project = "PF")
+IPF01$L1 <- "IPF1"
+IPF01$L2 <- "Pat"
+
+IPF02 <- CreateSeuratObject(counts = GSE122690[[12]], project = "PF")
+IPF02$L1 <- "IPF2"
+IPF02$L2 <- "Pat"
+
+IPF03 <- CreateSeuratObject(counts = GSE122690[[13]], project = "PF")
+IPF03$L1 <- "IPF3"
+IPF03$L2 <- "Pat"
+
+IPF04 <- CreateSeuratObject(counts = GSE122690[[14]], project = "PF")
+IPF04$L1 <- "IPF4"
+IPF04$L2 <- "Pat"
+
+Myo01 <- CreateSeuratObject(counts = GSE122690[[15]], project = "PF")
+Myo01$L1 <- "Myo01"
+Myo01$L2 <- "Pat"
+
+SSc01 <- CreateSeuratObject(counts = GSE122690[[16]], project = "PF")
+SSc01$L1 <- "SSc01"
+SSc01$L2 <- "Pat"
+
+SSc02 <- CreateSeuratObject(counts = GSE122690[[17]], project = "PF")
+SSc02$L1 <- "SSc02"
+SSc02$L2 <- "Pat"
+```
+
+
+```{r merging all 16 labelled samples (FiBL)}
+
+# merging Fibrosis Big with labels (FiBL)
+
+FiBL <- merge(D01, y = c(D02,  D03, D04, D05, D06, D07, 
+                        D08, HP01, IPF01, IPF02, IPF03, 
+                        IPF04, Myo01, SSc01, SSc02),
+              add.cell.ids = c("D01" , "D02" , "D03" , "D04" , "D05" , "D06" , "D07" , "D08" , "HP01" , "IPF01" , "IPF02" , "IPF03" , "IPF04" , "Myo01" , "SSc01" , "SSc02"),  project = "FiBL")
+```
+
+
