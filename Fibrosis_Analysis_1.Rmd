@@ -5,7 +5,7 @@ date: '2019-10-11'
 output: html_document
 ---
 
-We will explore the data from a recent [article](https://www.atsjournals.org/doi/pdf/10.1164/rccm.201712-2410OC) which explored lung cells from Pulmonary fibrosis patients by scRNAseq.
+We will dig in the data from a recent [article](https://www.atsjournals.org/doi/pdf/10.1164/rccm.201712-2410OC) which explored lung cells from Pulmonary fibrosis patients by using scRNAseq.
 
 
 * **Pulmonary fibrosis** is a progressive scarring of the lung tissue leading to death within 3-4 years.
@@ -36,14 +36,14 @@ vector_h5 <- c("Donor_01.h5",   "Donor_02.h5",   "Donor_03.h5",
 
 path <- file.path("data/FILTERED", vector_h5)
 
-# Read all h5 files with Read10X_h5 function
+# Read all h5 files with Read10X_h5 function, and load dome on a list named GSE122690
 
 GSE122690 <- lapply(path, Read10X_h5)
 ```
 
-```{r For labeling seurat objects}
-# Create Seurat OBject with labels
-
+```{r For labeling seurat objects, cache=TRUE}
+# Create Seurat Object with labels
+# I add here two labels (L1, L2) so that we can easily compare single patients and or compare groups i.e. healthy vs donor.
 # DONORS
 
 D01 <- CreateSeuratObject(counts = GSE122690[[1]], project = "Donor")
@@ -123,7 +123,7 @@ SSc02$L2 <- "Pat"
 
 ```{r merging all 16 labelled samples (FiBL)}
 
-# merging Fibrosis Big with labels (FiBL)
+# Merging Fibrosis Big with labels (FiBL)
 
 FiBL <- merge(D01, y = c(D02,  D03, D04, D05, D06, D07, 
                         D08, HP01, IPF01, IPF02, IPF03, 
@@ -131,4 +131,8 @@ FiBL <- merge(D01, y = c(D02,  D03, D04, D05, D06, D07,
               add.cell.ids = c("D01" , "D02" , "D03" , "D04" , "D05" , "D06" , "D07" , "D08" , "HP01" , "IPF01" , "IPF02" , "IPF03" , "IPF04" , "Myo01" , "SSc01" , "SSc02"),  project = "FiBL")
 ```
 
+
+```{Start analyzing}
+
+```
 
