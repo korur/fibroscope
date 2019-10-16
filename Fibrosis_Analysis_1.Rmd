@@ -26,6 +26,7 @@ I renamed the files for easy typing.
 
 ```{r Reading multiple h5 files, cache=TRUE}
 library(Seurat)
+library(ggplot2)
 # Create a Vector containing names of all of the files you want to read in the folder 
 vector_h5 <- c("Donor_01.h5",   "Donor_02.h5",   "Donor_03.h5", 
                "Donor_04.h5",   "Donor_05.h5",   "Donor_06.h5", 
@@ -132,7 +133,36 @@ FiBL <- merge(D01, y = c(D02,  D03, D04, D05, D06, D07,
 ```
 
 
-```{Start analyzing}
+#### QC and selecting cells for further analysis
 
+```{r add mitochondrial stas}
+# Let's add Mitochondrial stats to Fib data. [[ operator can add 
+# columns to object metadata. 
+
+FiBL[["percent.mt"]] <- PercentageFeatureSet(object = Fib, pattern = "^MT-")
 ```
 
+```{r qc, fig.height=7, fig.width=13}
+# Quick look at the Quality control metrics for the first 5 cells
+head(x = FiBL@meta.data, 5)
+```
+
+#### Violin plots to visualize QC metrics
+
+```{r qc2, fig.height=7, fig.width=13}
+#Visualize QC metrics as a violin plot
+VlnPlot(object = FiBL, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"),
+        ncol = 3)
+
+# We will use FeatureScatter to visualize feature-feature relationships like 
+# RNA counts or percentage of mitochondiral contamination
+
+plot1 <- FeatureScatter(object = FiBL, feature1 = "nCount_RNA", feature2 = "percent.mt") 
+plot2 <- FeatureScatter(object = FiBL, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") 
+CombinePlots(plots = list(plot1, plot2))
+# As you see on the left plot cells with high percentage of mitochondrial genes
+# have very low numbers of RNA indicating that they are low quality/dead cells.
+# Let's remove them.
+FiBL <- subset(x = FiBL, subset = nFeature_RNA > 200 & nFeature_RNA < 4000 & 
+              percent.mt < 12.5)
+```
